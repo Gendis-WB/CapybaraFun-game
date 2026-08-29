@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capybara Jump</title>
+  <link rel="stylesheet" href="projek.css" />
+</head>
+<body>
+  <div class="start-screen">
+    <h1>Capybara Jump</h1>
+
+    <label for="playerName">Masukkan Namamu:</label>
+    <input type="text" id="playerName" placeholder="Nama Pemain" />
+
+    <div class="selection">
+      <h2>Pilih Karakter:</h2>
+      <div class="character-options">
+        <img src="char1-rbg.png" alt="Capybara 1" class="character selected" />
+        <img src="char2-rbg.png" alt="Capybara 2" class="character" />
+        <img src="char3-rbg.png" alt="Capybara 3" class="character" />
+      </div>
+
+      <h2>Pilih Tema:</h2>
+      <select id="themeSelect">
+        <option value="day">Siang</option>
+        <option value="night">Malam</option>
+        <option value="retro">Mix</option>
+      </select>
+    </div>
+
+    <div class="audio-controls">
+  <label>
+    <input type="checkbox" id="musicToggle"> Musik
+  </label>
+  <label>
+    <input type="checkbox" id="sfxToggle" checked> Efek Suara
+  </label>
+    </div>
+
+
+    <button id="startBtn">Mulai Permainan</button>
+  </div>
+
+  <script src="projek.js"></script>
+</body>
+</html>
