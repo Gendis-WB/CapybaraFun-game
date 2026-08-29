@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Game Over - Capybara Jump</title>
+  <link rel="stylesheet" href="projek-.css"/>
+</head>
+<body>
+  <div class="container" id="themeContainer">
+    <h1 class="game-over-title">Game Over</h1>
+    <p id="finalScore">Skor Akhir: 0</p>
+    <p id="finalTime">Waktu: 0 detik</p>
+
+    <h2>Papan Skor</h2>
+    <table id="leaderboard">
+      <thead>
+        <tr>
+          <th>🏅</th>
+          <th>Pemain</th>
+          <th class="highlight">Poin</th>
+          <th>Skor</th>
+          <th>Waktu (detik)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="buttons">
+      <button id="restartBtn">🔄 Ulangi</button>
+      <button id="homeBtn">🏠 Menu Awal</button>
+    </div>
+  </div>
+
+  <audio id="gameOverMusic" loop></audio>
+  <script src="projek-.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Data Mahasiswa</title>
+</head>
+<body>
+    <script language="JavaScript">
+        function tampilanOutput() {
+            var nikstr = document.fform.Nik.value;
+            document.fform.onik.value = nikstr;
+        
+            var namastr = document.fform.Nama.value;
+            document.fform.onama.value = namastr;
+        
+            var genderstr = document.fform.Gender.value;
+            if (genderstr === "Pria") {
+                genderstr = "Laki-laki";
+            } else if (genderstr === "Wanita") {
+                genderstr = "Perempuan";
+            }
+            document.fform.Ogender.value = genderstr;
+        
+            var agamastr = document.fform.Agama.value;
+            document.fform.Oagama.value = agamastr;
+        
+            var ket = "";
+            var statusOutput = document.fform.ostatus;
+        
+            if (document.fform.status[0].checked) {
+                ket = "Kawin"; // disesuaikan dengan label di gambar
+                statusOutput[0].checked = true;
+            } else if (document.fform.status[1].checked) {
+                ket = "Belum Kawin";
+                statusOutput[1].checked = true;
+            }
+        
+            var jurusanstr = document.fform.Jurusan.value;
+            document.fform.Ojurusan.value = jurusanstr;
+        
+            var ketstr = document.fform.Ket.value;
+            document.fform.Oket.value = ketstr;
+        }
+    </script>
+        
+</body>
+
+</html>
