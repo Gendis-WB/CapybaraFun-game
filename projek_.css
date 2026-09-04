@@ -20,20 +20,32 @@ canvas {
   background-color: transparent;
 }
 
+/* Tambahkan atau sesuaikan bagian HUD di projek_.css */
 #hud {
   position: absolute;
-  top: 20px;
+  top: 15px;
   left: 50%;
   transform: translateX(-50%);
   color: #222;
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: bold;
-  background-color: rgba(255, 255, 255, 0.7);
-  padding: 8px 20px;
-  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 6px 15px;
+  border-radius: 10px;
   z-index: 10;
   display: flex;
-  gap: 25px;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 90vw;
+}
+
+@media (max-width: 600px) {
+  #hud {
+    font-size: 0.85rem;
+    gap: 8px;
+    padding: 5px 10px;
+  }
 }
 
 #controls {
