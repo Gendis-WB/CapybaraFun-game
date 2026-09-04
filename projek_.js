@@ -65,15 +65,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const balloonImg = new Image();
   balloonImg.src = 'balon-rbg.png';
 
-  // === AUDIO SETUP ===
+// === AUDIO SETUP ===
   const bgm = document.getElementById('bgm');
   const jumpSound = document.getElementById('jumpSound');
   const hitSound = document.getElementById('hitSound');
 
   if (bgm && musicOn) {
     bgm.volume = 0.4;
+    bgm.loop = true; // Pastikan loop menyala
     bgm.play().catch(() => {
       console.warn("Autoplay BGM dicegah browser, menunggu interaksi sentuh/klik.");
+    });
+
+    // Solusi agar musik 30 detik terus berulang tanpa terputus
+    bgm.addEventListener('ended', () => {
+      bgm.currentTime = 0;
+      if (musicOn && !isPaused) {
+        bgm.play().catch(() => {});
+      }
     });
   }
 
