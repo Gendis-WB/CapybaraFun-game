@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.height = window.innerHeight;
   });
 
-  // === ATUR TEMA ===
+  // === ATUR TEMA & VISUAL (Siang, Malam, Awan, Bintang) ===
   if (selectedTheme !== 'mix') {
     gameContainer.classList.add(`theme-${selectedTheme}`);
     applyVisualEffects(selectedTheme);
@@ -33,12 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyVisualEffects(theme) {
     visualEffects.innerHTML = '';
-    if (theme === 'day') {
+    if (theme === 'day' || theme === 'sunset') {
       const cloud = document.createElement('div');
       cloud.className = 'cloud';
       visualEffects.appendChild(cloud);
     } else if (theme === 'night') {
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 25; i++) {
         const star = document.createElement('div');
         star.className = 'star';
         star.style.top = `${Math.random() * 100}%`;
@@ -51,29 +51,65 @@ document.addEventListener('DOMContentLoaded', () => {
   // === VARIABEL GAME ===
   let score = 0, time = 0, point = 0;
   let isPaused = false, gameSpeed = 5, canJump = true;
-  let capy = { x: 100, y: 0, width: 100, height: 100, dy: 0 };
+  let capy = { x: 100, y: 0, width: 90, height: 90, dy: 0 };
   let obstacles = [];
 
-  // === GAMBAR ===
+  // === GAMBAR ASSETS ===
   const capyImg = new Image();
   capyImg.src = selectedCharacter;
-  capyImg.onerror = () => {
-    capyImg.src = 'char1-rbg.png'; // fallback
-  };
+  capyImg.onerror = () => { capyImg.src = 'char1-rbg.png'; };
+  
   const obstacleImg = new Image();
   obstacleImg.src = 'es_krim.png';
+  
   const balloonImg = new Image();
   balloonImg.src = 'balon-rbg.png';
 
-  // === AUDIO ===
-  let bgm, jumpSound, hitSound;
-  if (musicOn) {
-    bgm = new Audio('MusicGame.mp3'); bgm.loop = true;
+  // === AUDIO SETUP ===
+  const bgm = document.getElementById('bgm');
+  const jumpSound = document.getElementById('jumpSound');
+  const hitSound = document.getElementById('hitSound');
+
+  if (bgm && musicOn) {
+    bgm.volume = 0.4;
+    bgm.play().catch(() => {
+      console.warn("Autoplay BGM dicegah browser, menunggu interaksi sentuh/klik.");
+    });
   }
-  if (sfxOn) {
-    jumpSound = new Audio('JumpGame.mp3');
-    hitSound = new Audio('ClickGame.mp3');
+
+  // === FUNGSI LOMPAT (Trigger Utama Keyboard & Sentuh HP) ===
+  function triggerJump() {
+    if (canJump && !isPaused) {
+      capy.dy = -25;
+      canJump = false;
+      point++;
+      if (sfxOn && jumpSound) {
+        jumpSound.currentTime = 0;
+        jumpSound.play().catch(() => {});
+      }
+    }
   }
+
+  // Kontrol Keyboard (Spasi, Panah Atas, W)
+  document.addEventListener('keydown', e => {
+    if (['ArrowUp', 'KeyW', 'Space'].includes(e.code)) {
+      e.preventDefault();
+      triggerJump();
+    }
+  });
+
+  // Kontrol Sentuh / Klik untuk HP & Laptop
+  window.addEventListener('touchstart', (e) => {
+    // Hindari bentrok jika menekan tombol UI pause/restart
+    if (e.target.tagName === 'BUTTON') return;
+    if (bgm && bgm.paused && musicOn) bgm.play().catch(() => {});
+    triggerJump();
+  }, { passive: true });
+
+  window.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    if (bgm && bgm.paused && musicOn) bgm.play().catch(() => {});
+  }, { once: true });
 
   // === GAME LOOP ===
   function drawCapy() {
@@ -90,11 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function spawnObstacle() {
-    const isFlying = Math.random() < 0.3;
+    const isFlying = Math.random() < 0.35;
     const obs = {
       type: isFlying ? 'balloon' : 'icecream',
       x: canvas.width,
-      y: isFlying ? Math.random() * 50 + (canvas.height - 270) : canvas.height - 80,
+      y: isFlying ? Math.random() * 80 + (canvas.height - 280) : canvas.height - 90,
       width: 50,
       height: isFlying ? 60 : 50,
     };
@@ -104,8 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateCapy() {
     capy.dy += 1;
     capy.y += capy.dy;
-    if (capy.y > canvas.height - 100) {
-      capy.y = canvas.height - 100;
+    const groundLevel = canvas.height - 90;
+    if (capy.y > groundLevel) {
+      capy.y = groundLevel;
       capy.dy = 0;
       canJump = true;
     }
@@ -113,10 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function checkCollision() {
     return obstacles.some(obs =>
-      capy.x < obs.x + obs.width &&
-      capy.x + capy.width > obs.x &&
-      capy.y < obs.y + obs.height &&
-      capy.y + capy.height > obs.y
+      capy.x + 15 < obs.x + obs.width - 15 &&
+      capy.x + capy.width - 15 > obs.x + 15 &&
+      capy.y + 15 < obs.y + obs.height - 15 &&
+      capy.y + capy.height - 15 > obs.y + 15
     );
   }
 
@@ -128,7 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
       updateCapy();
 
       if (checkCollision()) {
-        if (sfxOn && hitSound) hitSound.play();
+        if (sfxOn && hitSound) {
+          hitSound.currentTime = 0;
+          hitSound.play().catch(() => {});
+        }
         endGame();
         return;
       }
@@ -136,11 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
       score++;
       scoreDisplay.textContent = `Skor: ${score}`;
       pointDisplay.textContent = `Poin: ${point}`;
-      if (score % 100 === 0) gameSpeed += 0.5;
+      if (score % 150 === 0) gameSpeed += 0.5;
     }
 
     if (selectedTheme === 'mix') {
-      const mixMode = Math.floor(score / 1000) % 2 === 0 ? 'day' : 'night';
+      const mixMode = Math.floor(score / 800) % 2 === 0 ? 'day' : 'night';
       gameContainer.className = `theme-${mixMode}`;
       applyVisualEffects(mixMode);
     }
@@ -156,31 +196,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 1000);
 
-  // === KONTROL JUMP ===
-  document.addEventListener('keydown', e => {
-  if ((e.code === 'ArrowUp' || e.code === 'KeyW') && canJump && !isPaused) {
-    capy.dy = -28;
-    canJump = false;
-    point++;
-    if (sfxOn && jumpSound) jumpSound.play();
-  }
-});
+  // === TOMBOL UI ===
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resumeBtn = document.getElementById('resumeBtn');
 
-
-  // === TOMBOL ===
-  document.getElementById('pauseBtn').addEventListener('click', () => {
+  pauseBtn.addEventListener('click', () => {
     isPaused = true;
     pauseBtn.style.display = 'none';
-    resumeBtn.style.display = 'inline';
+    resumeBtn.style.display = 'inline-block';
     if (bgm && !bgm.paused) bgm.pause();
   });
 
-  document.getElementById('resumeBtn').addEventListener('click', () => {
+  resumeBtn.addEventListener('click', () => {
     isPaused = false;
     resumeBtn.style.display = 'none';
-    pauseBtn.style.display = 'inline';
-    if (bgm && bgm.paused) bgm.play();
-    gameLoop();
+    pauseBtn.style.display = 'inline-block';
+    if (musicOn && bgm && bgm.paused) bgm.play();
   });
 
   document.getElementById('restartBtn').addEventListener('click', () => {
@@ -189,37 +220,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setInterval(() => {
     if (!isPaused) spawnObstacle();
-  }, 1500);
-
-  // === MAIN MULAI ===
-  document.body.addEventListener('click', () => {
-    if (musicOn && bgm && bgm.paused) bgm.play();
-  }, { once: true });
+  }, 1400);
 
   function endGame() {
+    if (bgm) bgm.pause();
     localStorage.setItem('finalScore', score);
     localStorage.setItem('finalTime', time);
     localStorage.setItem('finalPoint', point);
 
-    let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-    const existingIndex = leaderboard.findIndex(entry =>
-      entry.name === playerName && entry.score === score && entry.time === time
-    );
-
-    if (existingIndex === -1) {
-      leaderboard.push({ name: playerName, point, score, time });
-    }
-
-    leaderboard.sort((a, b) =>
-      b.point - a.point || b.score - a.score || a.time - b.time
-    );
-    leaderboard = leaderboard.slice(0, 10);
-    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-
     window.location.href = 'projek-.html';
   }
 
-  // Start game
+  // Jalankan game
   gameLoop();
 });
-
